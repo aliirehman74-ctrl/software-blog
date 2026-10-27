@@ -1,47 +1,39 @@
-import fs from "fs";
-import path from "path";
-import matter from "gray-matter";
-import { remark } from "remark";
-import remarkGfm from "remark-gfm";
-import html from "remark-html";
+import Link from "next/link";
+import type { Metadata } from "next";
+import { getAllPosts, getPost } from "@/lib/posts";
 
-const postsDir = path.join(process.cwd(), "posts");
+export const dynamicParams = false;
 
-export type PostMeta = {
-  slug: string;
-  title: string;
-  description: string;
-  date: string;
-  tags: string[];
-};
-
-function readPost(file: string) {
-  const slug = file.replace(/\.mdx?$/, "");
-  const raw = fs.readFileSync(path.join(postsDir, file), "utf8");
-  const { data, content } = matter(raw);
-  const meta: PostMeta = {
-    slug,
-    title: String(data.title ?? slug),
-    description: String(data.description ?? ""),
-    date: data.date ? new Date(data.date).toISOString().slice(0, 10) : "",
-    tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
-  };
-  return { meta, content };
+export function generateStaticParams() {
+  return getAllPosts().map((p) => ({ slug: p.slug }));
 }
 
-export function getAllPosts(): PostMeta[] {
-  if (!fs.existsSync(postsDir)) return [];
-  return fs
-    .readdirSync(postsDir)
-    .filter((f) => /\.mdx?$/.test(f))
-    .map((f) => readPost(f).meta)
-    .sort((a, b) => (a.date < b.date ? 1 : -1));
+type Props = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const { meta } = await getPost(slug);
+  return { title: meta.title, description: meta.description };
 }
 
-export async function getPost(slug: string) {
-  const file = fs.readdirSync(postsDir).find((f) => f.replace(/\.mdx?$/, "") === slug);
-  if (!file) throw new Error(`Post not found: ${slug}`);
-  const { meta, content } = readPost(file);
-  const processed = await remark().use(remarkGfm).use(html).process(content);
-  return { meta, html: processed.toString() };
+export default async function PostPage({ params }: Props) {
+  const { slug } = await params;
+  const { meta, html } = await getPost(slug);
+
+  return (
+    <main className="mx-auto max-w-2xl px-5 py-12">
+      <Link href="/" className="text-sm text-neutral-500 hover:underline">
+        ← All reviews
+      </Link>
+      <h1 className="mt-4 text-3xl font-bold tracking-tight">{meta.title}</h1>
+      <p className="mt-2 text-sm text-neutral-500">
+        {meta.date}
+        {meta.tags.length > 0 && ` · ${meta.tags.join(", ")}`}
+      </p>
+      <article
+        className="prose prose-neutral mt-8 max-w-none"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    </main>
+  );
 }
