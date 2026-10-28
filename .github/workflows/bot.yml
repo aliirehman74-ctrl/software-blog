@@ -3,8 +3,6 @@ name: Run Telegram Bot
 on:
   push:
     branches: [ main ]
-  schedule:
-    - cron: '*/15 * * * *' # Har 15 minute baad bot ko check/restart karega
   workflow_dispatch:
 
 jobs:
