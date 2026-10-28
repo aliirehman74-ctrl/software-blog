@@ -82,7 +82,8 @@ def generate_article(software: str) -> str:
     return clean_output(resp.choices[0].message.content)
 
 
-def validate_and_finalize(markdown: str) -> frontmatter.Post:
+def validate_and_finalize(markdown: str):
+
     post = frontmatter.loads(markdown)
     for key in ("title", "description", "tags"):
         if not post.metadata.get(key):
