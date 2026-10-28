@@ -1,1 +1,34 @@
 
+name: Run Telegram Bot
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install python-telegram-bot==21.0.1 groq PyGithub requests FrontMatter
+
+    - name: Run Bot
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        ADMIN_CHAT_ID: ${{ secrets.ADMIN_CHAT_ID }}
+        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        GITHUB_REPO: "aliirehman74-ctrl/software-blog"
+      run: |
+        python bot.py
