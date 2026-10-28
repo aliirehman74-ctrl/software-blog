@@ -39,7 +39,9 @@ export function getAllPosts(): PostMeta[] {
 }
 
 export async function getPost(slug: string) {
-  const file = fs.readdirSync(postsDir).find((f) => f.replace(/\.mdx?$/, "") === slug);
+  const file = fs
+    .readdirSync(postsDir)
+    .find((f) => f.replace(/\.mdx?$/, "") === slug);
   if (!file) throw new Error(`Post not found: ${slug}`);
   const { meta, content } = readPost(file);
   const processed = await remark().use(remarkGfm).use(html).process(content);
