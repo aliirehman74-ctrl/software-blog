@@ -17,12 +17,9 @@ log = logging.getLogger("blogbot")
 
 # ---------- Config (environment variables) ----------
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
-ADMIN_CHAT_ID = int(os.environ["ADMIN_CHAT_ID"])
+ADMIN_CHAT_ID = 9161348784  # Seedha aapki ID yahan rakh di hai
 GROQ_API_KEY = os.environ["GROQ_API_KEY"]
-GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
-GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
-GITHUB_REPO = os.environ["GITHUB_REPO"]            # "username/repo"
-GITHUB_BRANCH = os.environ.get("GITHUB_BRANCH", "main")
+
 SITE_URL = os.environ.get("SITE_URL", "").rstrip("/")  # e.g. https://myblog.vercel.app
 WEBHOOK_SECRET = os.environ.get("WEBHOOK_SECRET", "change-me-secret")  # letters/digits/_/-
 RENDER_URL = os.environ.get("RENDER_EXTERNAL_URL")  # set automatically on Render
